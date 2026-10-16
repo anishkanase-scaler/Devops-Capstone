@@ -1,12 +1,19 @@
 # Secrets: commit backend/.env.example, never the real .env
 .env
 
+# SQLite test database (created by pytest from pytest.ini, deleted after the run)
+test.db
+*.db
+*.sqlite
+*.sqlite3
+
 # Python
 __pycache__/
 *.pyc
 .venv/
 .pytest_cache/
-*.db
+.coverage
+htmlcov/
 
 # Node / frontend build
 node_modules/

@@ -106,5 +106,26 @@ Terraform output and State list.
 ![alt text](image-23.png)
 
 
+19. Installed Helm Chart for Prometheus
+![alt text](image-24.png)
+
+
+20. populated Grafana dashboard screenshot for my project
+![alt text](image-25.png)
+
+
+21. curl /metrics
+![alt text](image-26.png)
+
+
+22. Prometheus 
+![alt text](image-27.png)
+
+
+23. Prometheus targets
+![alt text](image-28.png)
+
+
+
 Video Link inside Drive folde:
 https://drive.google.com/drive/folders/1eQ9GsEEKd5uq27uqpHmT0j0bvrJPos4W?usp=sharing

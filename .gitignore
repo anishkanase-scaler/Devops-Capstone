@@ -1,0 +1,23 @@
+# Secrets: commit backend/.env.example, never the real .env
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+*.db
+
+# Node / frontend build
+node_modules/
+dist/
+
+# Terraform (state can contain secrets)
+.terraform/
+*.tfstate*
+
+# Logs, editors, OS
+*.log
+.idea/
+.vscode/
+.DS_Store

@@ -30,7 +30,7 @@ jobs:
         run: npm ci && npm run build
         working-directory: frontend
 
-  # 2. Build both Docker images, tag them with the commit SHA and push them to GHCR.
+  # 2. Build both Docker images, scan them with Trivy, then push them to GHCR tagged with the commit SHA.
   build-push:
     needs: test
     if: github.event_name == 'push'   # pull requests only run the tests
@@ -52,6 +52,24 @@ jobs:
         run: |
           docker build -t ghcr.io/${{ github.repository_owner }}/petal-shop-backend:${{ github.sha }} ./backend
           docker build -t ghcr.io/${{ github.repository_owner }}/petal-shop-frontend:${{ github.sha }} ./frontend
+
+      # Security gate: fail the pipeline if either image has a fixable HIGH or CRITICAL CVE, so it never gets pushed.
+      - name: Scan backend image with Trivy
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/petal-shop-backend:${{ github.sha }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
+
+      - name: Scan frontend image with Trivy
+        if: ${{ !cancelled() }}   # scan the frontend even when the backend scan already failed
+        uses: aquasecurity/trivy-action@0.30.0
+        with:
+          image-ref: ghcr.io/${{ github.repository_owner }}/petal-shop-frontend:${{ github.sha }}
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'
 
       - name: Push images
         run: |

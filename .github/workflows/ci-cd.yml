@@ -1,0 +1,59 @@
+name: Petal Shop CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # 1. Test the backend and build the frontend. If anything fails, nothing gets built or pushed.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install backend dependencies
+        run: pip install -r requirements-dev.txt
+        working-directory: backend
+      - name: Run backend tests (SQLite, from pytest.ini)
+        run: pytest -v
+        working-directory: backend
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Build frontend
+        run: npm ci && npm run build
+        working-directory: frontend
+
+  # 2. Build both Docker images, tag them with the commit SHA and push them to GHCR.
+  build-push:
+    needs: test
+    if: github.event_name == 'push'   # pull requests only run the tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build images
+        run: |
+          docker build -t ghcr.io/${{ github.repository_owner }}/petal-shop-backend:${{ github.sha }} ./backend
+          docker build -t ghcr.io/${{ github.repository_owner }}/petal-shop-frontend:${{ github.sha }} ./frontend
+
+      - name: Push images
+        run: |
+          docker push ghcr.io/${{ github.repository_owner }}/petal-shop-backend:${{ github.sha }}
+          docker push ghcr.io/${{ github.repository_owner }}/petal-shop-frontend:${{ github.sha }}

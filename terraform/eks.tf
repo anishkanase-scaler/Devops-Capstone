@@ -88,7 +88,7 @@ resource "aws_eks_node_group" "main" {
   subnet_ids      = [aws_subnet.public_a.id, aws_subnet.public_b.id]
 
   instance_types = [var.node_instance_type]
-  disk_size      = 10 # GiB; the free tier includes 30 GiB of EBS in total
+  disk_size      = 20 # GiB; the free tier includes 30 GiB of EBS in total
 
   scaling_config {
     desired_size = 2

@@ -1,0 +1,22 @@
+backend:
+  image: petal-shop-backend
+  tag: latest
+  replicas: 2
+
+frontend:
+  image: petal-shop-frontend
+  tag: latest
+  replicas: 2
+
+pullPolicy: IfNotPresent   
+
+postgres:
+  image: postgres:16-alpine
+  database: petal
+  user: petal
+  password: petal          
+  storage: 1Gi
+
+ingress:
+  className: nginx         
+  host: petal.local

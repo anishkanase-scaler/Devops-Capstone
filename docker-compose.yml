@@ -11,6 +11,8 @@ services:
       test: ["CMD-SHELL", "pg_isready -U petal -d petal"]
       interval: 3s
       retries: 10
+    networks:
+      - backend-net
 
   backend:
     build: ./backend
@@ -21,6 +23,9 @@ services:
     depends_on:
       postgres:
         condition: service_healthy   # wait until Postgres is ready, not just started
+    networks:
+      - frontend-net
+      - backend-net
 
   frontend:
     build: ./frontend
@@ -28,6 +33,14 @@ services:
       - "3000:8080"
     depends_on:
       - backend
+    networks:
+      - frontend-net
+
+networks:
+  frontend-net:   # frontend <-> backend
+    driver: bridge
+  backend-net:    # backend <-> database
+    driver: bridge
 
 volumes:
   postgres-data:
